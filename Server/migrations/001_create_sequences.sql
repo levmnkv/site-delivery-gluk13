@@ -1,15 +1,12 @@
---Создаем последовательность
-
-\c food_delivery;
-
-CREATE SEQUENCE IF NOT EXISTS public.permissions_id_seq
+-- Создаем последовательности
+CREATE SEQUENCE IF NOT EXISTS permissions_id_seq
     AS integer START WITH 1 INCREMENT BY 1 NO MINVALUE NO MAXVALUE CACHE 1;
 
-CREATE SEQUENCE IF NOT EXISTS public.products_id_seq
+CREATE SEQUENCE IF NOT EXISTS products_id_seq
     AS integer START WITH 1 INCREMENT BY 1 NO MINVALUE NO MAXVALUE CACHE 1;
 
-CREATE SEQUENCE IF NOT EXISTS public.roles_id_seq
+CREATE SEQUENCE IF NOT EXISTS roles_id_seq
     AS integer START WITH 1 INCREMENT BY 1 NO MINVALUE NO MAXVALUE CACHE 1;
 
-CREATE SEQUENCE IF NOT EXISTS public.users_id_seq
+CREATE SEQUENCE IF NOT EXISTS users_id_seq
     AS integer START WITH 1 INCREMENT BY 1 NO MINVALUE NO MAXVALUE CACHE 1;

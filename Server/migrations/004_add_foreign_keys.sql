@@ -1,21 +1,39 @@
-\c food_delivery;
+-- Permissions
+INSERT INTO permissions (id, code, description) VALUES
+(1, 'view_products', 'Просмотр товаров'),
+(2, 'create_product', 'Создание товаров'),
+(3, 'edit_product', 'Редактирование товаров'),
+(4, 'delete_product', 'Удаление товаров'),
+(5, 'view_orders', 'Просмотр заказов'),
+(6, 'edit_order', 'Редактирование заказов'),
+(7, 'manager_users', 'Управление пользователями')
+ON CONFLICT (id) DO NOTHING;
 
-ALTER TABLE ONLY public.role_permissions 
-    ADD CONSTRAINT role_permissions_permission_id_fkey 
-    FOREIGN KEY (permission_id) REFERENCES public.permissions(id);
+-- Roles
+INSERT INTO roles (id, name) VALUES
+(1, 'customer'),
+(2, 'admin'),
+(3, 'manager')
+ON CONFLICT (id) DO NOTHING;
 
-ALTER TABLE ONLY public.role_permissions 
-    ADD CONSTRAINT role_permissions_role_id_fkey 
-    FOREIGN KEY (role_id) REFERENCES public.roles(id);
+-- Role-Permissions
+INSERT INTO role_permissions (role_id, permission_id) VALUES
+(1, 1), (1, 5),
+(2, 1), (2, 2), (2, 3), (2, 4), (2, 5), (2, 6), (2, 7),
+(3, 1), (3, 2), (3, 3), (3, 5), (3, 6)
+ON CONFLICT (role_id, permission_id) DO NOTHING;
 
-ALTER TABLE ONLY public.users 
-    ADD CONSTRAINT users_role_id_fkey 
-    FOREIGN KEY (role_id) REFERENCES public.roles(id);
+-- Users
+INSERT INTO users (id, email, password_hash, role_id, name) VALUES
+(1, 'manager@example.com', '$2b$10$92IXUNpkjO0rOQ5byMi.Ye4oKoEa3Ro9llC/.og/at2.uheWG/igi', 3, 'Unknown'),
+(2, 'user@example.com', '$2b$10$92IXUNpkjO0rOQ5byMi.Ye4oKoEa3Ro9llC/.og/at2.uheWG/igi', 1, 'Unknown'),
+(3, 'admin@example.com', '$2b$10$92IXUNpkjO0rOQ5byMi.Ye4oKoEa3Ro9llC/.og/at2.uheWG/igi', 2, 'Unknown'),
+(4, 'art.nek.13@gmail.com', '$2b$10$eIjgxgpKzd.GoBll11oKe.l2HvMscI55hRH7/dYWxGg9ZOHZHaWYC', 1, 'Артем')
+ON CONFLICT (id) DO NOTHING;
 
-ALTER TABLE order_items 
-    ADD CONSTRAINT fk_order_items_order_id 
-    FOREIGN KEY (order_id) REFERENCES orders(id) ON DELETE CASCADE;
-
-ALTER TABLE order_items 
-    ADD CONSTRAINT fk_order_items_product_id 
-    FOREIGN KEY (product_id) REFERENCES public.products(id);
+-- Orders
+INSERT INTO orders (user_id, address, order_number, status, total_amount) VALUES
+(4, 'ул. Тестовая, 1', 'ORD-TEST-1', 'Новый', 1500.00),
+(4, 'ул. Тестовая, 2', 'ORD-TEST-2', 'Собран', 2000.00),
+(4, 'ул. Тестовая, 3', 'ORD-TEST-3', 'Доставляется', 3000.00)
+ON CONFLICT (id) DO NOTHING;

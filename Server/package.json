@@ -9,6 +9,7 @@
     "migrate": "node scripts/run-migrations.js",
     "migrate:create": "node scripts/create-migration.js",
     "railway:start": "npm run migrate && npm start",
+    "db:reset": "node scripts/reset-database.js",
     "seed:test-users": "node scripts/seedUsers.js",
     "test": "cross-env NODE_OPTIONS=--experimental-vm-modules jest",
     "test:watch": "cross-env NODE_OPTIONS=--experimental-vm-modules jest --watch",
