@@ -25,11 +25,13 @@ ON CONFLICT (role_id, permission_id) DO NOTHING;
 
 -- Users
 INSERT INTO users (id, email, password_hash, role_id, name) VALUES
-(1, 'manager@example.com', '$2b$10$92IXUNpkjO0rOQ5byMi.Ye4oKoEa3Ro9llC/.og/at2.uheWG/igi', 3, 'Unknown'),
-(2, 'user@example.com', '$2b$10$92IXUNpkjO0rOQ5byMi.Ye4oKoEa3Ro9llC/.og/at2.uheWG/igi', 1, 'Unknown'),
-(3, 'admin@example.com', '$2b$10$92IXUNpkjO0rOQ5byMi.Ye4oKoEa3Ro9llC/.og/at2.uheWG/igi', 2, 'Unknown'),
-(4, 'art.nek.13@gmail.com', '$2b$10$eIjgxgpKzd.GoBll11oKe.l2HvMscI55hRH7/dYWxGg9ZOHZHaWYC', 1, 'Артем')
-ON CONFLICT (id) DO NOTHING;
+(1, 'admin@test.com', '$2a$10$92IXUNpkjO0rOQ5byMi.Ye4oKoEa3Ro9llC/.og/at2.uheWG/igi', 2, 'Администратор'),
+(2, 'user@test.com', '$2a$10$92IXUNpkjO0rOQ5byMi.Ye4oKoEa3Ro9llC/.og/at2.uheWG/igi', 1, 'Тестовый Пользователь')
+ON CONFLICT (id) DO UPDATE SET 
+  email = EXCLUDED.email,
+  password_hash = EXCLUDED.password_hash,
+  role_id = EXCLUDED.role_id,
+  name = EXCLUDED.name;
 
 -- Orders
 INSERT INTO orders (user_id, address, order_number, status, total_amount) VALUES
