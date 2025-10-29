@@ -93,8 +93,6 @@ async function runMigrations() {
 // Запускаем миграции
 runMigrations().then(() => {
   console.log('Миграции завершены');
-  process.exit(0);
 }).catch(error => {
   console.error('Неустранимая ошибка:', error);
-  process.exit(1);
 });
