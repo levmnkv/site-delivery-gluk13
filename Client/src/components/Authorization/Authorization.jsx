@@ -39,13 +39,18 @@ const Authorization = () => {
         e.preventDefault();
         setMessage('');
         clearError();
-
-        const result = await login(loginData.email, loginData.password);
-        
-        if (result.success) {
-            navigate('/');
-        } else {
-            setMessage(result.message || 'Ошибка входа');
+        try {
+            const result = await login(loginData.email, loginData.password);
+            
+            // ✅ ПРАВИЛЬНАЯ ПРОВЕРКА
+            if (result && result.success) {
+                navigate('/');
+            } else {
+                setMessage(result?.message || 'Ошибка входа');
+            }
+        } catch (error) {
+            console.error('Login error:', error);
+            setMessage(error.message || 'Ошибка входа');
         }
     };
 
