@@ -18,15 +18,38 @@ const __filename = fileURLToPath(import.meta.url);
 const __dirname = dirname(__filename);
 
 const app = express();
+
+//Middleware
 const corsOptions = {
-  origin: (origin, callback) => {
-    callback(null, true);
-  },
-  methods: ['GET','POST','PUT','PATCH','DELETE','OPTIONS'],
-  allowedHeaders: ['Content-Type','Authorization'],
-  credentials: false,
-};
+    origin: function (origin, callback) {
+      // Разрешаем запросы без origin (например, из мобильных приложений)
+      if (!origin) return callback(null, true);
+      
+      // Разрешенные домены
+      const allowedOrigins = [
+        'http://localhost:3000',
+        'http://localhost:5173',
+        'https://site-delivery-z5i5.vercel.app',
+        'https://site-delivery-z5i5-*.vercel.app',
+        'https://site-delivery-production-a039.up.railway.app'
+      ];
+      
+      if (allowedOrigins.indexOf(origin) !== -1 || origin.endsWith('.vercel.app')) {
+        callback(null, true);
+      } else {
+        callback(new Error('CORS not allowed'));
+      }
+    },
+    credentials: true, // ✅ ВКЛЮЧИТЬ для работы с cookies/tokens
+    methods: ['GET', 'POST', 'PUT', 'PATCH', 'DELETE', 'OPTIONS'],
+    allowedHeaders: ['Content-Type', 'Authorization', 'X-Requested-With'],
+    optionsSuccessStatus: 200
+  };
+  
 app.use(cors(corsOptions));
+app.use(express.json());
+
+// ✅ ДОБАВЬТЕ обработку preflight запросов
 app.options('*', cors(corsOptions));
 app.use(express.json());
 
@@ -43,6 +66,27 @@ app.use('/api/orders',authenticateToken, checkoutRole, adminOrdersRoutes);
 app.get('/api/test', (req, res) => {
     res.json ({messege: 'Сервер работает!'});
 })
+
+app.get('/health', (req, res) => {
+    res.status(200).json({ 
+      status: 'OK', 
+      timestamp: new Date().toISOString(),
+      service: 'Express API'
+    });
+  });
+  
+// ✅ ДОБАВЬТЕ обработку корневого пути
+app.get('/', (req, res) => {
+res.json({ 
+    message: 'Food Delivery API', 
+    endpoints: {
+    test: '/api/test',
+    health: '/health',
+    products: '/api/products',
+    auth: '/api/users'
+    }
+});
+});
 
 export default app;
 
