@@ -41,13 +41,7 @@ const Authorization = () => {
         clearError();
         try {
             const result = await login(loginData.email, loginData.password);
-            
-            // ✅ ПРАВИЛЬНАЯ ПРОВЕРКА
-            if (result && result.success) {
-                navigate('/');
-            } else {
-                setMessage(result?.message || 'Ошибка входа');
-            }
+            navigate('/');
         } catch (error) {
             console.error('Login error:', error);
             setMessage(error.message || 'Ошибка входа');

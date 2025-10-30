@@ -76,16 +76,13 @@ app.get('/health', (req, res) => {
   });
   
 // ✅ ДОБАВЬТЕ обработку корневого пути
-app.get('/', (req, res) => {
-res.json({ 
-    message: 'Food Delivery API', 
-    endpoints: {
-    test: '/api/test',
-    health: '/health',
-    products: '/api/products',
-    auth: '/api/users'
-    }
-});
+app.get('*', (req, res) => {
+  // Если запрос не начинается с /api - это запрос к фронтенду
+  if (!req.path.startsWith('/api')) {
+    return res.redirect('https://site-delivery-brown.vercel.app' + req.path);
+  }
+  // Для API routes - 404
+  res.status(404).json({ error: 'API route not found' });
 });
 
 export default app;
