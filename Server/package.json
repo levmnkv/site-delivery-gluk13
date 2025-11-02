@@ -6,7 +6,7 @@
   "scripts": {
     "dev": "nodemon server.js",
     "start": "node server.js",
-    "migrate": "node-pg-migrate up --migrations-dir migrations",
+    "migrate": "node migrations/runMigrations.js",
     "migrate:create": "node-pg-migrate create init_tables --migration-file-language sql",
     "railway:start": "npm run migrate && npm start",
     "seed:test-users": "node scripts/seedUsers.js",

@@ -3,8 +3,9 @@ builder = "DOCKERFILE"
 dockerfilePath = "Dockerfile"
 
 [deploy]
-numReplicas = 1
-restartPolicyType = "ON_FAILURE"
+startCommand = "./start.sh"
+healthCheckPath = "/api/health"
+healthCheckTimeout = 300
 
 [[services]]
 name = "web"
