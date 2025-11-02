@@ -1,72 +1,42 @@
-services:
-  postgres:
-    image: postgres:15-alpine
-    healthcheck:
-      test: ["CMD-SHELL", "pg_isready -U postgres"]
-      interval: 5s
-      timeout: 5s
-      retries: 10
-    env_file:
-      - ./.env
-    environment:
-      POSTGRES_DB: ${DB_NAME}
-      POSTGRES_USER: ${DB_USER}
-      POSTGRES_PASSWORD: ${DB_PASSWORD}
-    volumes:
-      - postgres_data:/var/lib/postgresql/data
-      - ./Server/migrations:/docker-entrypoint-initdb.d
-    mem_limit: 512m
-    mem_reservation: 256m
+# Мульти-стадийная сборка
+FROM node:18-alpine as client-builder
+WORKDIR /app/client
+COPY Client/package*.json ./
+RUN npm ci
+COPY Client/ ./
+RUN npm run build
 
-  redis:
-    image: redis:7-alpine
-    command: redis-server --appendonly yes
-    env_file:
-      - ./.env
-    volumes:
-      - redis_data:/data
-    restart: always
+FROM node:18-alpine as server-builder
+WORKDIR /app/server
+COPY Server/package*.json ./
+RUN npm ci
+COPY Server/ ./
+RUN npm run build
 
-  backend:
-    build:
-      context: ./Server
-      dockerfile: Dockerfile
-    ports:
-      - "4200:4200"
+# Финальный образ
+FROM node:18-alpine
+WORKDIR /app
 
-    networks:
-      - default
+# Копируем бэкенд
+COPY --from=server-builder /app/server /app/server
+WORKDIR /app/server
 
-    env_file:
-      - ./.env
-    environment:
-      PORT: 4200
-      DB_HOST: postgres
-      DB_PORT: 5432
-      DOCKER_ENV: true
-      NODE_ENV: production
-    depends_on:
-      postgres:
-        condition: service_healthy
-      redis:
-        condition: service_started
-    mem_limit: 512m
-    mem_reservation: 256m
+# Копируем фронтенд
+COPY --from=client-builder /app/client/dist /app/client
 
-  frontend:
-    build: 
-      context: ./Client              
-      dockerfile: Dockerfile
+# Устанавливаем зависимости для продакшена
+RUN npm ci --only=production
 
-    networks:
-      - default
+# Устанавливаем nginx
+RUN apk add --no-cache nginx
 
-    ports:
-      - "3000:80"
-    depends_on:
-      backend:
-        condition: service_started
+# Копируем конфиг nginx
+COPY nginx/nginx.conf /etc/nginx/http.d/default.conf
 
-volumes:
-  postgres_data:
-  redis_data:
+# Запускаем скрипт
+COPY start.sh /app/start.sh
+RUN chmod +x /app/start.sh
+
+EXPOSE 8000
+
+CMD ["/app/start.sh"]
