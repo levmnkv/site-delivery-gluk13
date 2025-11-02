@@ -6,22 +6,24 @@ dotenv.config();
 let redisClientInstance = null;
 
 const createRedisClient = () => {
-  const redisConfig = {
-    host: process.env.REDIS_HOST || process.env.REDISHOST || 'redis',
-    port: parseInt(process.env.REDIS_PORT || process.env.REDISPORT) || 6379,
-    connectTimeout: 5000,
-    retryDelayOnFailover: 100,
-    maxRetriesPerRequest: 2,
-    lazyConnect: true,
-    showFriendlyErrorStack: true,
-  };
-
-  const redisPassword = process.env.REDIS_PASSWORD || process.env.REDISPASS || process.env.REDISPASSWORD;
-  if (redisPassword) {
-    redisConfig.password = redisPassword;
+  const redisUrl = process.env.REDIS_URL;
+  
+  if (redisUrl) {
+    return new Redis(redisUrl, {
+      connectTimeout: 5000,
+      retryDelayOnFailover: 100,
+      maxRetriesPerRequest: 2,
+      lazyConnect: true,
+      showFriendlyErrorStack: true,
+    });
+  } else {
+    return new Redis({
+      host: 'localhost',
+      port: 6379,
+      connectTimeout: 5000,
+      lazyConnect: true,
+    });
   }
-
-  return new Redis(redisConfig);
 };
 
 const getRedisClient = () => {
