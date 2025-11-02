@@ -6,9 +6,9 @@
   "scripts": {
     "dev": "nodemon server.js",
     "start": "node server.js",
-    "migrate": "node-pg-migrate",
-    "migrate:create": "node-pg-migrate create",
-    "railway:start": "npm run migrate:create && npm start",
+    "migrate": "node-pg-migrate up",
+    "migrate:create": "node-pg-migrate create init_tables --migration-file-language sql",
+    "railway:start": "npm run migrate && npm start",
     "seed:test-users": "node scripts/seedUsers.js",
     "test": "cross-env NODE_OPTIONS=--experimental-vm-modules jest",
     "test:watch": "cross-env NODE_OPTIONS=--experimental-vm-modules jest --watch",
