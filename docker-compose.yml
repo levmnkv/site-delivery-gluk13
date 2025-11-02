@@ -1,3 +1,37 @@
+FROM node:18-alpine as client-builder
+WORKDIR /app/client
+COPY Client/package*.json ./
+RUN npm ci
+COPY Client/ ./
+RUN npm run build
+
+FROM node:18-alpine as server-builder
+WORKDIR /app/server
+COPY Server/package*.json ./
+RUN npm ci
+COPY Server/ ./
+RUN npm run build
+
+FROM node:18-alpine
+WORKDIR /app
+
+COPY --from=server-builder /app/server /app/server
+WORKDIR /app/server
+
+COPY --from=client-builder /app/client/dist /app/client
+
+RUN npm ci --only=production
+
+RUN apk add --no-cache nginx
+
+COPY nginx/nginx.conf /etc/nginx/http.d/default.conf
+
+COPY start.sh /app/start.sh
+RUN chmod +x /app/start.sh
+
+EXPOSE 8000
+
+CMD ["/app/start.sh"]
 version: '3.8'
 
 services:
