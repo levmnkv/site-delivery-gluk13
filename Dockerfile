@@ -1,43 +1,27 @@
-# Мульти-стадийная сборка
-FROM node:18-alpine as client-builder
+FROM node:18-alpine
+
+WORKDIR /app
+
+# Копируем файлы зависимостей
+COPY Server/package*.json ./server/
+COPY Client/package*.json ./client/
+
+# Устанавливаем зависимости клиента и собираем
 WORKDIR /app/client
-COPY Client/package*.json ./
 RUN npm ci
 COPY Client/ ./
 RUN npm run build
 
-FROM node:18-alpine as server-builder
-WORKDIR /app/server
-COPY Server/package*.json ./
-RUN npm ci
-COPY Server/ ./
-RUN npm run build
-
-# Финальный образ
-FROM node:18-alpine
-WORKDIR /app
-
-# Копируем бэкенд
-COPY --from=server-builder /app/server /app/server
-
-# Копируем фронтенд
-COPY --from=client-builder /app/client/dist /app/client
-
-# Устанавливаем зависимости для продакшена
+# Устанавливаем зависимости сервера
 WORKDIR /app/server
 RUN npm ci --only=production
+COPY Server/ ./
 
-# Устанавливаем nginx
-RUN apk add --no-cache nginx
+# Копируем скрипт запуска
+COPY start.sh /app/start.sh
+RUN chmod +x /app/start.sh
 
-# Копируем конфиг nginx
-COPY nginx/nginx.conf /etc/nginx/http.d/default.conf
+# Открываем порт сервера
+EXPOSE 4200
 
-# Создаем скрипт запуска
-WORKDIR /app
-COPY start.sh ./
-RUN chmod +x ./start.sh
-
-EXPOSE 8000
-
-CMD ["./start.sh"]
+CMD ["/app/start.sh"]

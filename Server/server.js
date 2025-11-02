@@ -1,7 +1,9 @@
-import app from './app.js';
+import express from 'express';
 
-const PORT = process.env.PORT || 4200;
-app.listen(PORT, '0.0.0.0', () => {
-    console.log(`Сервер запущен на порту ${PORT}`);
-    console.log(`Проверить его можно здесь: http://localhost:${PORT}/api/test`);
+const app = express();
+
+app.use(express.static('../client/dist'));
+
+app.get('*', (req, res) => {
+  res.sendFile(path.join(__dirname, '../client/dist/index.html'));
 });
