@@ -6,10 +6,10 @@
   "scripts": {
     "dev": "nodemon server.js",
     "start": "node server.js",
-    "migrate": "node scripts/run-migrations.js",
-    "migrate:create": "node scripts/create-migration.js",
+    "migrate": "node migrations/migrate.js",
+    "migrate:create": "node migrations/migrate.js",
     "railway:start": "npm run migrate && npm start",
-    "db:init": "node scripts/run-migrations.js",
+    "db:init": "node migrations/migrate.js",
     
     "seed:test-users": "node scripts/seedUsers.js",
     "test": "cross-env NODE_OPTIONS=--experimental-vm-modules jest",
