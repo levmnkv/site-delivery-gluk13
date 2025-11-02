@@ -11,6 +11,7 @@
     "start": "serve -s dist -p $PORT"
   },
   "dependencies": {
+    "serve": "^14.2.1",
     "leaflet": "^1.9.4",
     "react": "^19.1.1",
     "react-dom": "^19.1.1",
