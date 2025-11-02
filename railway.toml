@@ -1,15 +1,14 @@
 [build]
-builder = "nixpacks"
+builder = "DOCKERFILE"
+dockerfilePath = "Dockerfile"
+
+[deploy]
+numReplicas = 1
+restartPolicyType = "ON_FAILURE"
 
 [[services]]
-name = "client"
-root_directory = "client"
-[services.deploy]
-build_command = "npm install && npm run build"
-start_command = "npx serve -s dist -p $PORT"
+name = "web"
+port = 8000
 
-[[services]]  
-name = "server"
-root_directory = "server"
-[services.deploy]
-start_command = "npm run migrate && npm start"
+[services.env]
+NODE_ENV = "production"
